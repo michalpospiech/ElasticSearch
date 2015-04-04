@@ -1,6 +1,14 @@
 {
 	"name": "vhrb/elastic-search",
+	"description": "Integration official PHP client for Elasticsearch into Nette Framework",
 	"keywords": ["nette", "elasticsearch", "search", "elastic", "es"],
+	"license": "Apache-2.0",
+	"authors": [
+		{
+			"name": "Michal Dobrovolný",
+			"email": "xdobro4@gmail.com"
+		}
+	],
 	"require": {
 		"php": ">=5.3",
 		"nette/nette": "~2.1",
