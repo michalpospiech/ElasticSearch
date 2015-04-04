@@ -32,15 +32,18 @@ Optional
 
 ```yml
 elastic:
-	hosts: [
-		- [host: 127.0.0.1, port: 9200]
+	hosts:
+		- {
+			host: 127.0.0.1
+			port: 9200		
+		}
 	debugger: %debugMode%	
 	...
 ```
 
 [Elastic search config](http://www.elastic.co/guide/en/elasticsearch/client/php-api/current/_configuration.html#_full_list_of_configurations)
 
-## Using
+## Use of
 
 ```php
 class EsService {
@@ -49,28 +52,34 @@ class EsService {
 	private $client;
 	
 	public function __construct(Elasticsearch\Client $client) {
-		$this->client = $client;	}}
+		$this->client = $client;
+	}
+}
 ```
 Client implement all [ElasticSearch-php](http://www.elastic.co/guide/en/elasticsearch/client/php-api/current/) methods!
 
-## Custom
+## Custom use
 
 ```php
 class EsService {
 
-	protected function getPanel() {		if($this->panel === NULL) $this->panel = Panel::register($this);
-		return $this->panel;	}
+	protected function getPanel() {
+		if($this->panel === NULL) $this->panel = Panel::register($this);
+		return $this->panel;
+	}
 	
 	public function request() {
 		...
+		
 		$this->getPanel()->->failure($method, $fullURI, $body, $headers, $duration, $statusCode, $response, $exception);
 
 		//
 
-		$this->panel->success($method, $fullURI, $body, $headers, $statusCode, $response, $duration);	}
+		$this->panel->success($method, $fullURI, $body, $headers, $statusCode, $response, $duration);
+	}
 
 ```
 
 -----
-Homepage [https://www.vhrb.cz](https://www.vhrb.cz)/[Vhřb](https://github.com/vhrb).
+Homepage [https://www.vhrb.cz](https://www.vhrb.cz) / [Vhřb](https://github.com/vhrb).
 
