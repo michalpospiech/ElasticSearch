@@ -148,7 +148,6 @@ class Panel extends Nette\Object implements IBarPanel
 
 	public function success($method, $fullURI, $body, $headers, $statusCode, $response, $duration)
 	{
-		bd('log');
 		self::$panel->queries[] = Nette\Utils\ArrayHash::from([
 			'method' => $method,
 			'fullURI' => $fullURI,
