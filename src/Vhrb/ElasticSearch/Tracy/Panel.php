@@ -46,7 +46,7 @@ class Panel extends Nette\Object implements IBarPanel
 	/**
 	 * @var array
 	 */
-	public $queries = [];
+	public $queries = array();
 
 	/** @var Connection */
 	private $connection;
@@ -96,7 +96,7 @@ class Panel extends Nette\Object implements IBarPanel
 
 			}
 			catch (Nette\Utils\JsonException $e) {
-				return [];
+				return array();
 			}
 		};
 
@@ -127,7 +127,7 @@ class Panel extends Nette\Object implements IBarPanel
 					$item->method,
 					$path,
 					$item->headers,
-					Json::encode(['explain' => 1] + $extractData($item->body))
+					Json::encode(array('explain' => 1) + $extractData($item->body))
 				);
 
 				// replace the search response with the explained response
@@ -148,7 +148,7 @@ class Panel extends Nette\Object implements IBarPanel
 
 	public function success($method, $fullURI, $body, $headers, $statusCode, $response, $duration)
 	{
-		self::$panel->queries[] = Nette\Utils\ArrayHash::from([
+		self::$panel->queries[] = Nette\Utils\ArrayHash::from(array(
 			'method' => $method,
 			'fullURI' => $fullURI,
 			'body' => $body,
@@ -156,7 +156,7 @@ class Panel extends Nette\Object implements IBarPanel
 			'statusCode' => $statusCode,
 			'response' => $response,
 			'duration' => $duration
-		]);
+		));
 		self::$panel->totalTime += $duration;
 		self::$panel->queriesCount++;
 	}
@@ -164,7 +164,7 @@ class Panel extends Nette\Object implements IBarPanel
 
 	public function failure($method, $fullURI, $body, $headers, $duration, $statusCode, $response, $exception)
 	{
-		self::$panel->queries[] = Nette\Utils\ArrayHash::from([
+		self::$panel->queries[] = Nette\Utils\ArrayHash::from(array(
 			'method' => $method,
 			'fullURI' => $fullURI,
 			'body' => $body,
@@ -173,7 +173,7 @@ class Panel extends Nette\Object implements IBarPanel
 			'statusCode' => $statusCode,
 			'response' => $response,
 			'exception' => $exception
-		]);
+		));
 		self::$panel->totalTime += $duration;
 		self::$panel->queriesCount++;
 	}

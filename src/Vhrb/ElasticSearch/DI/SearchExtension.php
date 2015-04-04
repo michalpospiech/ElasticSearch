@@ -13,14 +13,14 @@ class SearchExtension extends Nette\DI\CompilerExtension
 	/**
 	 * @var array
 	 */
-	public $defaults = [
+	public $defaults = array(
 		'debugger' => '%debugMode%',
-		'hosts' => [
+		'hosts' => array(
 			'host' => '127.0.0.1',
 			'port' => 9200,
-		],
+		),
 		'connectionClass' => '\Vhrb\ElasticSearch\Connection',
-	];
+	);
 
 
 	public function loadConfiguration()
