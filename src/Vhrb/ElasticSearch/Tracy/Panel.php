@@ -63,10 +63,10 @@ class Panel extends Nette\Object implements IBarPanel
 		$tab = Html::el('span')->title('ElasticSearch')->add($img);
 		$title = Html::el()->setText('ElasticSearch');
 
-		if (self::$panel->queriesCount) {
+		if ($this->queriesCount) {
 			$title->setText(
-				self::$panel->queriesCount . ' call' . (self::$panel->queriesCount > 1 ? 's' : '') .
-				' / ' . sprintf('%0.2f', self::$panel->totalTime * 1000) . ' ms'
+				$this->queriesCount . ' call' . ($this->queriesCount > 1 ? 's' : '') .
+				' / ' . sprintf('%0.2f', $this->totalTime * 1000) . ' ms'
 			);
 		}
 
@@ -78,7 +78,7 @@ class Panel extends Nette\Object implements IBarPanel
 	 */
 	public function getPanel()
 	{
-		if (!self::$panel->queries) {
+		if (!$this->queries) {
 			return NULL;
 		}
 
@@ -89,7 +89,7 @@ class Panel extends Nette\Object implements IBarPanel
 				return \Tracy\Dumper::toHtml($o, ['collapse' => $c, 'depth' => $d]);
 			}
 			: callback('\Tracy\Helpers::clickableDump');
-		$totalTime = self::$panel->totalTime ? sprintf('%0.3f', self::$panel->totalTime * 1000) . ' ms' : 'none';
+		$totalTime = $this->totalTime ? sprintf('%0.3f', $this->totalTime * 1000) . ' ms' : 'none';
 		$extractData = function ($object) {
 			try {
 				return Json::decode($object, Json::FORCE_ARRAY);
@@ -101,7 +101,7 @@ class Panel extends Nette\Object implements IBarPanel
 		};
 
 		$processedQueries = [];
-		$queries = self::$panel->queries;
+		$queries = $this->queries;
 		foreach ($queries as $i => $item) {
 			$explode = explode('/', $item->fullURI);
 			$host = $explode[2];
@@ -123,7 +123,7 @@ class Panel extends Nette\Object implements IBarPanel
 				$explode = explode('/', $item->fullURI);
 				$path = '/' . implode('/', array_slice($explode, count($explode) - 3));
 
-				$response = self::$panel->connection->performRequest(
+				$response = $this->connection->performRequest(
 					$item->method,
 					$path,
 					$item->headers,
@@ -148,7 +148,7 @@ class Panel extends Nette\Object implements IBarPanel
 
 	public function success($method, $fullURI, $body, $headers, $statusCode, $response, $duration)
 	{
-		self::$panel->queries[] = Nette\Utils\ArrayHash::from(array(
+		$this->queries[] = Nette\Utils\ArrayHash::from(array(
 			'method' => $method,
 			'fullURI' => $fullURI,
 			'body' => $body,
@@ -157,14 +157,14 @@ class Panel extends Nette\Object implements IBarPanel
 			'response' => $response,
 			'duration' => $duration
 		));
-		self::$panel->totalTime += $duration;
-		self::$panel->queriesCount++;
+		$this->totalTime += $duration;
+		$this->queriesCount++;
 	}
 
 
 	public function failure($method, $fullURI, $body, $headers, $duration, $statusCode, $response, $exception)
 	{
-		self::$panel->queries[] = Nette\Utils\ArrayHash::from(array(
+		$this->queries[] = Nette\Utils\ArrayHash::from(array(
 			'method' => $method,
 			'fullURI' => $fullURI,
 			'body' => $body,
@@ -174,8 +174,8 @@ class Panel extends Nette\Object implements IBarPanel
 			'response' => $response,
 			'exception' => $exception
 		));
-		self::$panel->totalTime += $duration;
-		self::$panel->queriesCount++;
+		$this->totalTime += $duration;
+		$this->queriesCount++;
 	}
 
 	/**
