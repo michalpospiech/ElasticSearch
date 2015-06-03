@@ -39,7 +39,7 @@ elastic:
 	...
 ```
 
-[Elastic search config](http://www.elastic.co/guide/en/elasticsearch/client/php-api/current/_configuration.html#_full_list_of_configurations)
+[Elastic search config](https://www.elastic.co/guide/en/elasticsearch/client/php-api/1.0/_configuration.html#_full_list_of_configurations)
 
 ## Use of
 
@@ -54,7 +54,7 @@ class EsService {
 	}
 }
 ```
-Client implement all [ElasticSearch-php](http://www.elastic.co/guide/en/elasticsearch/client/php-api/current/) methods!
+Client implements all [ElasticSearch-php](http://www.elastic.co/guide/en/elasticsearch/client/php-api/current/) methods!
 
 ## Custom use
 
