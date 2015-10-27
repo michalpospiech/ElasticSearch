@@ -30,7 +30,7 @@
 			<table>
 				<?php if ($request) { $requestData = $extractData($request); ?><tr>
 					<th width="70">Request:</th>
-					<td><?php echo $click($requestData, TRUE, 15); ?></td>
+					<td><?php echo $click($requestData, TRUE, 5); ?></td>
 					</tr><?php } ?>
 
 				<?php if ($response) { $responseData = $extractData($response); ?>
@@ -54,16 +54,16 @@
 						<?php if (isset($responseData['hits'])) { ?>
 							<tr><th width="70">Total&nbsp;hits:</th><td><?php echo $click($responseData['hits']['total']); ?></td></tr>
 							<tr><th width="70">Max&nbsp;hit&nbsp;score:</th><td><?php echo $click($responseData['hits']['max_score']); ?></td></tr>
-							<tr><th width="70">Results:</th><td><?php echo $click($responseData['hits']['hits'], TRUE, 15); ?></td></tr>
+							<tr><th width="70">Results:</th><td><?php echo $click($responseData['hits']['hits'], TRUE, 5); ?></td></tr>
 							<?php if (isset($responseData['aggregations'])) { ?>
-								<tr><th width="70">Aggregation:</th><td><?php echo $click($responseData['aggregations'], TRUE, 15); ?></td></tr>
+								<tr><th width="70">Aggregation:</th><td><?php echo $click($responseData['aggregations'], TRUE, 5); ?></td></tr>
 							<?php } ?>
 						<?php } ?>
 
 					<?php } else { ?>
 						<tr>
 							<th width="70">Response:</th>
-							<td><?php echo $click($extractData($response), TRUE, 15); ?></td>
+							<td><?php echo $click($extractData($response), TRUE, 5); ?></td>
 						</tr>
 					<?php } ?>
 
@@ -71,7 +71,7 @@
 						<tr>
 							<th width="70">Explain:</th>
 							<?php /* \Tracy\Debugger::dump($query); */ ?>
-							<td><?php echo $click($query->explain, TRUE, 15); ?></td>
+							<td><?php echo $click($query->explain, TRUE, 5); ?></td>
 						</tr>
 					<?php } ?>
 
