@@ -2,6 +2,8 @@
 
 namespace Vhrb\ElasticSearch\DI;
 
+use Elasticsearch\ClientBuilder;
+use Elasticsearch\Client;
 use Vhrb;
 use Nette;
 use Nette\PhpGenerator as Code;
@@ -17,9 +19,8 @@ class SearchExtension extends Nette\DI\CompilerExtension
 		'debugger' => '%debugMode%',
 		'hosts' => array(
 			'host' => '127.0.0.1',
-			'port' => 9200,
 		),
-		'connectionClass' => '\Vhrb\ElasticSearch\Connection',
+//		'connectionClass' => '\Vhrb\ElasticSearch\Connection',
 	);
 
 
@@ -29,13 +30,20 @@ class SearchExtension extends Nette\DI\CompilerExtension
 		$config = $this->getConfig($this->defaults);
 
 		unset($config['debugger']);
+		foreach ($config['hosts'] as $key => $host) {
+			if ($key == 'port') {
+				trigger_error('Param "port" is deprecated. Use host:port', E_USER_DEPRECATED);
+			}
+		}
 
 		$builder->addDefinition($this->prefix('client'))
-			->setClass('Elasticsearch\Client', [$config]);
+			->setFactory(ClientBuilder::class . "::fromConfig", [$config])
+			->setClass(Client::class);
 	}
 
 	public function afterCompile(Nette\PhpGenerator\ClassType $class)
 	{
+		return;
 		$config = $this->getConfig($this->defaults);
 
 		$initialize = $class->methods['initialize'];

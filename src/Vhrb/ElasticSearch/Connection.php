@@ -2,23 +2,24 @@
 
 namespace Vhrb\ElasticSearch;
 
+use Elasticsearch\Transport;
 use Vhrb\ElasticSearch\DI\SearchExtension;
 use Vhrb\ElasticSearch\Tracy\Panel;
-use Elasticsearch\Connections\GuzzleConnection;
+use Elasticsearch\Connections\Connection AS EC;
 use Nette\Utils\Strings;
 
-class Connection extends GuzzleConnection
+class Connection extends EC
 {
 	/** @var null|Panel */
 	private $panel = NULL;
 
-	public function performRequest($method, $uri, $params = NULL, $body = NULL, $options = [])
+	public function performRequest($method, $uri, $params = NULL, $body = NULL, $options = [], Transport $transport)
 	{
 		if ($this->panel === NULL && SearchExtension::$ELASTIC_DEBUGGER) {
 			$this->panel = Panel::register($this);
 		}
 
-		$response = parent::performRequest($method, $uri, $params, $body, $options);
+		$response = parent::performRequest($method, $uri, $params, $body, $options, $transport);
 
 		return $response;
 	}
