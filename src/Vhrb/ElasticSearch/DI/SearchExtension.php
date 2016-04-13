@@ -7,6 +7,7 @@ use Elasticsearch\Client;
 use Vhrb;
 use Nette;
 use Nette\PhpGenerator as Code;
+use Vhrb\ElasticSearch\Tracy\Panel;
 
 class SearchExtension extends Nette\DI\CompilerExtension
 {
@@ -20,7 +21,6 @@ class SearchExtension extends Nette\DI\CompilerExtension
 		'hosts' => array(
 			'host' => '127.0.0.1',
 		),
-//		'connectionClass' => '\Vhrb\ElasticSearch\Connection',
 	);
 
 
@@ -29,6 +29,7 @@ class SearchExtension extends Nette\DI\CompilerExtension
 		$builder = $this->getContainerBuilder();
 		$config = $this->getConfig($this->defaults);
 
+		$debugger = $config['debugger'];
 		unset($config['debugger']);
 		foreach ($config['hosts'] as $key => $host) {
 			if ($key == 'port') {
@@ -36,14 +37,23 @@ class SearchExtension extends Nette\DI\CompilerExtension
 			}
 		}
 
-		$builder->addDefinition($this->prefix('client'))
+		if ($debugger) {
+			$builder->addDefinition($this->prefix('panel'))
+				->setClass(Panel::class);
+			$config['logger'] = $this->prefix('@panel');
+		}
+
+		$elastic = $builder->addDefinition($this->prefix('client'))
 			->setFactory(ClientBuilder::class . "::fromConfig", [$config])
 			->setClass(Client::class);
+
+		if ($debugger) {
+			$elastic->addSetup($this->prefix('@panel') . '::register', []);
+		}
 	}
 
 	public function afterCompile(Nette\PhpGenerator\ClassType $class)
 	{
-		return;
 		$config = $this->getConfig($this->defaults);
 
 		$initialize = $class->methods['initialize'];

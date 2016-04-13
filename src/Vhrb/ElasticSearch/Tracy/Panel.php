@@ -5,6 +5,7 @@ namespace Vhrb\ElasticSearch\Tracy;
 use Nette;
 use Nette\Utils\Html;
 use Nette\Utils\Json;
+use Psr\Log\LoggerInterface;
 use Tracy\Bar;
 use Tracy\BlueScreen;
 use Tracy\Debugger;
@@ -28,10 +29,9 @@ if (!class_exists('Tracy\Dumper')) {
 	class_alias('Nette\Diagnostics\Dumper', 'Tracy\Dumper');
 }
 
-class Panel extends Nette\Object implements IBarPanel
+class Panel extends Nette\Object implements IBarPanel, LoggerInterface
 {
-	/** @var null|Panel */
-	private static $panel = NULL;
+	private static $log = FALSE;
 
 	/**
 	 * @var float
@@ -47,9 +47,6 @@ class Panel extends Nette\Object implements IBarPanel
 	 * @var array
 	 */
 	public $queries = array();
-
-	/** @var Connection */
-	private $connection;
 
 	/**
 	 * Renders HTML code for custom tab.
@@ -70,7 +67,7 @@ class Panel extends Nette\Object implements IBarPanel
 			);
 		}
 
-		return (string)$tab->add($title);
+		return (string) $tab->add($title);
 	}
 
 	/**
@@ -79,7 +76,7 @@ class Panel extends Nette\Object implements IBarPanel
 	public function getPanel()
 	{
 		if (!$this->queries) {
-			return NULL;
+//			return NULL;
 		}
 
 		ob_start();
@@ -90,55 +87,10 @@ class Panel extends Nette\Object implements IBarPanel
 			}
 			: callback('\Tracy\Helpers::clickableDump');
 		$totalTime = $this->totalTime ? sprintf('%0.3f', $this->totalTime * 1000) . ' ms' : 'none';
-		$extractData = function ($object) {
-			try {
-				return Json::decode($object, Json::FORCE_ARRAY);
 
-			}
-			catch (Nette\Utils\JsonException $e) {
-				return array();
-			}
-		};
-
-		$processedQueries = [];
 		$queries = $this->queries;
 		foreach ($queries as $i => $item) {
-			$explode = explode('/', $item->fullURI);
-			$host = $explode[2];
-			$processedQueries[$host][$i] = $item;
-
-			if (isset($item->exception)) {
-				continue; // exception, do not re-execute
-			}
-
-			if (Nette\Utils\Strings::endsWith($item->fullURI, '_search') === FALSE || !in_array($item->method, ['GET', 'POST'])) {
-				continue; // explain only search queries
-			}
-
-			if (!is_array($data = $extractData($item->response))) {
-				continue;
-			}
-
-			try {
-				$explode = explode('/', $item->fullURI);
-				$path = '/' . implode('/', array_slice($explode, count($explode) - 3));
-
-				$response = $this->connection->performRequest(
-					$item->method,
-					$path,
-					$item->headers,
-					Json::encode(array('explain' => 1) + $extractData($item->body))
-				);
-
-				// replace the search response with the explained response
-				$processedQueries[$host][$i]->explain = $response;
-
-			}
-			catch (\Exception $e) {
-//				dd($e);
-				// ignore
-			}
-
+			$processedQueries[''][$i] = $item;
 		}
 		require __DIR__ . '/panel.phtml';
 
@@ -146,62 +98,174 @@ class Panel extends Nette\Object implements IBarPanel
 	}
 
 
-	public function success($method, $fullURI, $body, $headers, $statusCode, $response, $duration)
-	{
-		$this->queries[] = Nette\Utils\ArrayHash::from(array(
-			'method' => $method,
-			'fullURI' => $fullURI,
-			'body' => $body,
-			'headers' => $headers,
-			'statusCode' => $statusCode,
-			'response' => $response,
-			'duration' => $duration
-		));
-		$this->totalTime += $duration;
-		$this->queriesCount++;
-	}
-
-
-	public function failure($method, $fullURI, $body, $headers, $duration, $statusCode, $response, $exception)
-	{
-		$this->queries[] = Nette\Utils\ArrayHash::from(array(
-			'method' => $method,
-			'fullURI' => $fullURI,
-			'body' => $body,
-			'headers' => $headers,
-			'duration' => $duration,
-			'statusCode' => $statusCode,
-			'response' => $response,
-			'exception' => $exception
-		));
-		$this->totalTime += $duration;
-		$this->queriesCount++;
-	}
-
-	/**
-	 * @param Connection $connection
-	 *
-	 * @return Panel
-	 */
-	public static function register(Connection $connection)
-	{
-		if (self::$panel === NULL) {
-			self::$panel = new self;
-			self::getDebuggerBar()->addPanel(self::$panel);
-		}
-
-		if (self::$panel->connection === NULL) self::$panel->connection = $connection;
-
-		return self::$panel;
-	}
-
-
 	/**
 	 * @return Bar
 	 */
-	private static function getDebuggerBar()
+	public function register()
 	{
-		return method_exists('Tracy\Debugger', 'getBar') ? Debugger::getBar() : Debugger::$bar;
+		return Debugger::getBar()->addPanel($this);
 	}
 
+	/**
+	 * System is unusable.
+	 *
+	 * @param string $message
+	 * @param array $context
+	 *
+	 * @return null
+	 */
+	public function emergency($message, array $context = array())
+	{
+		// @TODO: Implement emergency() method.
+		if (self::$log) bd('emergency', $message, $context);
+	}
+
+	/**
+	 * Action must be taken immediately.
+	 *
+	 * Example: Entire website down, database unavailable, etc. This should
+	 * trigger the SMS alerts and wake you up.
+	 *
+	 * @param string $message
+	 * @param array $context
+	 *
+	 * @return null
+	 */
+	public function alert($message, array $context = array())
+	{
+		// @TODO: Implement alert() method.
+		if (self::$log) bd('alert', $message, $context);
+	}
+
+	/**
+	 * Critical conditions.
+	 *
+	 * Example: Application component unavailable, unexpected exception.
+	 *
+	 * @param string $message
+	 * @param array $context
+	 *
+	 * @return null
+	 */
+	public function critical($message, array $context = array())
+	{
+		// @TODO: Implement critical() method.
+		if (self::$log) bd('critical', $message, $context);
+	}
+
+	/**
+	 * Runtime errors that do not require immediate action but should typically
+	 * be logged and monitored.
+	 *
+	 * @param string $message
+	 * @param array $context
+	 *
+	 * @return null
+	 */
+	public function error($message, array $context = array())
+	{
+		// @TODO: Implement error() method.
+		if (self::$log) bd('error', $message, $context);
+	}
+
+	/**
+	 * Exceptional occurrences that are not errors.
+	 *
+	 * Example: Use of deprecated APIs, poor use of an API, undesirable things
+	 * that are not necessarily wrong.
+	 *
+	 * @param string $message
+	 * @param array $context
+	 *
+	 * @return null
+	 */
+	public function warning($message, array $context = array())
+	{
+		// @TODO: Implement warning() method.
+		if (self::$log) bd('warning', $message, $context);
+	}
+
+	/**
+	 * Normal but significant events.
+	 *
+	 * @param string $message
+	 * @param array $context
+	 *
+	 * @return null
+	 */
+	public function notice($message, array $context = array())
+	{
+		// @TODO: Implement notice() method.
+		if (self::$log) bd('notice', $message, $context);
+	}
+
+	/**
+	 * Interesting events.
+	 *
+	 * Example: User logs in, SQL logs.
+	 *
+	 * @param string $message
+	 * @param array $context
+	 *
+	 * @return null
+	 */
+	public function info($message, array $context = array())
+	{
+		// @TODO: Implement info() method.
+		if (self::$log) bd('info', $message, $context);
+		$this->queries[] = [
+				'message' => $message,
+			] + $context;
+
+		$this->totalTime = $context['duration'];
+		$this->queriesCount++;
+	}
+
+	/**
+	 * Detailed debug information.
+	 *
+	 * @param string $message
+	 * @param array $context
+	 *
+	 * @return null
+	 */
+	public function debug($message, array $context = array())
+	{
+		// @TODO: Implement debug() method.
+		if (self::$log) bd('debug', $message, $context);
+
+		if ($message == "Response") {
+			$this->queries[] = [
+				'message' => $message,
+				'response' => $context[0],
+			];
+		}
+		else {
+			try {
+				$json = Json::decode($context[0], Json::FORCE_ARRAY);
+			} catch (Nette\Utils\JsonException $e) {
+				$json = array();
+			}
+
+			$this->queries[] = [
+				'message' => $message,
+				'body' => $json,
+			];
+		}
+	}
+
+	/**
+	 * Logs with an arbitrary level.
+	 *
+	 * @param mixed $level
+	 * @param string $message
+	 * @param array $context
+	 *
+	 * @return null
+	 */
+	public function log($level, $message, array $context = array())
+	{
+		// @TODO: Implement log() method.
+		if (self::$log) bd('log', $message, $context);
+	}
 }

@@ -54,29 +54,7 @@ class EsService {
 	}
 }
 ```
-Client implements all [ElasticSearch-php](http://www.elastic.co/guide/en/elasticsearch/client/php-api/current/) methods!
-
-## Custom use
-
-```php
-class EsService {
-
-	protected function getPanel() {
-		if($this->panel === NULL) $this->panel = Panel::register($this);
-		return $this->panel;
-	}
-	
-	public function request() {
-		...
-		
-		$this->getPanel()->->failure($method, $fullURI, $body, $headers, $duration, $statusCode, $response, $exception);
-
-		//
-
-		$this->panel->success($method, $fullURI, $body, $headers, $statusCode, $response, $duration);
-	}
-
-```
+Client support all [ElasticSearch-php](http://www.elastic.co/guide/en/elasticsearch/client/php-api/current/) methods!
 
 -----
 Homepage [https://www.vhrb.cz](https://www.vhrb.cz) / [Vhřb](https://github.com/vhrb).
