@@ -57,7 +57,7 @@ class Panel extends Nette\Object implements IBarPanel, LoggerInterface
 	{
 		$img = Html::el('img', ['height' => '16px'])
 			->src('data:image/png;base64,' . base64_encode(file_get_contents(__DIR__ . '/logo.png')));
-		$tab = Html::el('span')->title('ElasticSearch')->add($img);
+		$tab = Html::el('span')->title('ElasticSearch')->addHtml($img);
 		$title = Html::el()->setText('ElasticSearch');
 
 		if ($this->queriesCount) {
@@ -67,7 +67,7 @@ class Panel extends Nette\Object implements IBarPanel, LoggerInterface
 			);
 		}
 
-		return (string) $tab->add($title);
+		return (string) $tab->addText($title);
 	}
 
 	/**
