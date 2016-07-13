@@ -89,6 +89,7 @@ class Panel extends Nette\Object implements IBarPanel, LoggerInterface
 		$totalTime = $this->totalTime ? sprintf('%0.3f', $this->totalTime * 1000) . ' ms' : 'none';
 
 		$queries = $this->queries;
+		$processedQueries = [];
 		foreach ($queries as $i => $item) {
 			$processedQueries[''][$i] = $item;
 		}
