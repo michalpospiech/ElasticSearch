@@ -10,8 +10,8 @@ use Tracy\Bar;
 use Tracy\BlueScreen;
 use Tracy\Debugger;
 use Tracy\Dumper;
+use Tracy\Helpers;
 use Tracy\IBarPanel;
-use Vhrb\ElasticSearch\Connection;
 
 
 if (!class_exists('Tracy\Debugger')) {
@@ -80,12 +80,12 @@ class Panel extends Nette\Object implements IBarPanel, LoggerInterface
 		}
 
 		ob_start();
-		$esc = callback('Nette\Templating\Helpers::escapeHtml');
-		$click = class_exists('\Tracy\Dumper')
-			? function ($o, $c = FALSE, $d = 4) {
-				return \Tracy\Dumper::toHtml($o, ['collapse' => $c, 'depth' => $d]);
-			}
-			: callback('\Tracy\Helpers::clickableDump');
+		$esc = function ($s) {
+			return Helpers::escapeHtml($s);
+		};
+		$click = function ($o, $c = FALSE, $d = 4) {
+			return \Tracy\Dumper::toHtml($o, ['collapse' => $c, 'depth' => $d]);
+		};
 		$totalTime = $this->totalTime ? sprintf('%0.3f', $this->totalTime * 1000) . ' ms' : 'none';
 
 		$queries = $this->queries;

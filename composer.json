@@ -11,9 +11,9 @@
 	],
 	"require": {
 		"php": ">=5.3",
-		"tracy/tracy": "~2.3",
-		"nette/di": "~2.3",
-		"nette/php-generator": "~2.3",
+		"tracy/tracy": "~2.4",
+		"nette/di": "~2.4",
+		"nette/php-generator": "~2.4",
 		"elasticsearch/elasticsearch": "~2"
 	},
 	"autoload": {
