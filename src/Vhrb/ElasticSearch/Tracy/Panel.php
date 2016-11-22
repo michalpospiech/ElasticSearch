@@ -83,8 +83,8 @@ class Panel extends Nette\Object implements IBarPanel, LoggerInterface
 		$esc = function ($s) {
 			return Helpers::escapeHtml($s);
 		};
-		$click = function ($o, $c = FALSE, $d = 4) {
-			return \Tracy\Dumper::toHtml($o, ['collapse' => $c, 'depth' => $d]);
+		$click = function ($o, $c = FALSE) {
+			return \Tracy\Dumper::toHtml($o, [Dumper::COLLAPSE => $c, Dumper::DEPTH => Debugger::$maxDepth]);
 		};
 		$totalTime = $this->totalTime ? sprintf('%0.3f', $this->totalTime * 1000) . ' ms' : 'none';
 

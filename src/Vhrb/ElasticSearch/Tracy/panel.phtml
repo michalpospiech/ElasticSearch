@@ -40,9 +40,8 @@
 		<?php foreach ($queries as $query): ?>
 			<?php /* \Tracy\Debugger::dump($query); */ ?>
 
-			<?php $query = \Nette\Utils\ArrayHash::from($query); ?>
 			<h2>
-				<?php echo $esc($query->message) ?>
+				<?php echo $esc($query['message']) ?>
 			</h2>
 
 			<table>

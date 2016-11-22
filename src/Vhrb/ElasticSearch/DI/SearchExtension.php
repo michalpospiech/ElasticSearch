@@ -18,11 +18,7 @@ class SearchExtension extends Nette\DI\CompilerExtension
 	 */
 	public $defaults = array(
 		'debugger' => '%debugMode%',
-		'hosts' => array(
-			'host' => '127.0.0.1',
-		),
 	);
-
 
 	public function loadConfiguration()
 	{
@@ -31,12 +27,6 @@ class SearchExtension extends Nette\DI\CompilerExtension
 
 		$debugger = $config['debugger'];
 		unset($config['debugger']);
-		foreach ($config['hosts'] as $key => $host) {
-			if ($key == 'port') {
-				trigger_error('Param "port" is deprecated. Use host:port', E_USER_DEPRECATED);
-			}
-		}
-
 		if ($debugger) {
 			$builder->addDefinition($this->prefix('panel'))
 				->setClass(Panel::class);
