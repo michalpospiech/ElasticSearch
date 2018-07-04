@@ -29,8 +29,10 @@ if (!class_exists('Tracy\Dumper')) {
 	class_alias('Nette\Diagnostics\Dumper', 'Tracy\Dumper');
 }
 
-class Panel extends Nette\Object implements IBarPanel, LoggerInterface
+class Panel implements IBarPanel, LoggerInterface
 {
+	use Nette\SmartObject;
+
 	private static $log = FALSE;
 
 	/**
